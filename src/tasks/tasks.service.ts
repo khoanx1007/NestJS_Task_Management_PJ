@@ -1,5 +1,5 @@
-import { Injectable, NotFoundException, forwardRef } from '@nestjs/common';
-import { CreateTaskDTO, FilterTasksDTO } from './task.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateTaskDTO, FilterTasksDTO, UpdateTaskDTO } from './task.dto';
 import { Task, TaskStatus } from './task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -29,10 +29,9 @@ export class TasksService {
     return newTask
   }
 
-  async updateTaskStatus(id: number, status: TaskStatus): Promise<Task>{
-    const task = await this.taskRepository.findOneBy({id: id});
-    task.status = status;
-    task.save();
+  async updateTask(id: number, updateTaskDTO: UpdateTaskDTO): Promise<Task>{
+    const task = this.getTaskById(id);
+    this.taskRepository.update({ id }, { ...updateTaskDTO });
     return task;
   }
 

@@ -1,5 +1,6 @@
 import { IsIn, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
 import { TaskStatus } from './task.entity';
+import { PartialType } from '@nestjs/mapped-types';
 export class CreateTaskDTO{
   @IsNotEmpty()
   @MaxLength(50)
@@ -8,6 +9,10 @@ export class CreateTaskDTO{
   @IsNotEmpty()
   @MaxLength(255)
   description: string;
+}
+
+export class UpdateTaskDTO extends PartialType(CreateTaskDTO){
+  status: TaskStatus;
 }
 export class FilterTasksDTO{
   @IsOptional()
