@@ -12,6 +12,7 @@ export class CreateTaskDTO{
 }
 
 export class UpdateTaskDTO extends PartialType(CreateTaskDTO){
+  @IsIn([TaskStatus.DONE, TaskStatus.IN_PROGRESS, TaskStatus.OPEN])
   status: TaskStatus;
 }
 export class FilterTasksDTO{
