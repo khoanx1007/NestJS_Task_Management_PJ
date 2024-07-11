@@ -1,10 +1,14 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { CreateTaskDTO, FilterTasksDTO } from './task.dto';
+import { CreateTaskDTO, FilterTasksDTO, UpdateTaskDTO } from './task.dto';
 import { TaskStatusValidationPipe } from 'src/pipes/task-status-validaton.pipes';
-import { Task, TaskStatus } from './task.entity';
+import { Task } from './task.entity';
+import { AuthGuard } from '@nestjs/passport';
+import { GetUser } from 'src/auth/get-user.decorator';
+import { User } from 'src/users/user.entity';
 
 @Controller('tasks')
+@UseGuards(AuthGuard('jwt'))
 export class TasksController {
   constructor(private readonly tasksService: TasksService){}
 
@@ -13,22 +17,26 @@ export class TasksController {
     return this.tasksService.getAllTasks(filterTasksDTO);
   }
 
+  @Get('/personal-tasks')
+  getPersonalTasks(@GetUser() user: User): Promise<Task[]>{
+    return this.tasksService.getPersonalTasks(user);
+  }
+
   @Get(':id')
   getTaskById(@Param('id', ParseIntPipe) id: number): Promise<Task>{
     return this.tasksService.getTaskById(id);
   }
-
   @Post()
-  createTask(@Body(ValidationPipe) createTaskDTO: CreateTaskDTO): Promise<Task>{
-    return this.tasksService.createTask(createTaskDTO);
+  createTask(@Body() createTaskDTO: CreateTaskDTO, @GetUser() user: User): Promise<Task>{
+    return this.tasksService.createTask(createTaskDTO, user);
   }
 
-  @Patch(':id/status')
+  @Patch(':id')
   updateTaskStatus(
     @Param('id', ParseIntPipe) id: number,
-    @Body('status', TaskStatusValidationPipe) status: TaskStatus
+    @Body('status', TaskStatusValidationPipe) updateTaskDTO:UpdateTaskDTO
   ): Promise<Task>{
-    return this.tasksService.updateTaskStatus(id, status);
+    return this.tasksService.updateTask(id, updateTaskDTO);
   }
 
   @Delete(':id')
