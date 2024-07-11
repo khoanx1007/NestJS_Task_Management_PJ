@@ -13,4 +13,4 @@ import { User } from 'src/users/user.entity';
   controllers: [TasksController],
   providers: [TasksService, JwtStrategy, UsersService],
 })
-export class TasksModule {}
+export class TasksModule { }

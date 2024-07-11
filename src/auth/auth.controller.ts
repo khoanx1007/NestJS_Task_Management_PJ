@@ -7,9 +7,9 @@ import { GetUser } from './get-user.decorator';
 
 @Controller()
 export class AuthController {
-  constructor(@Inject() private readonly authService: AuthService){}
+  constructor(@Inject() private readonly authService: AuthService) { }
   @Post('/signup')
-  signup(@Body() signupDTO:SignUpDTO){
+  signup(@Body() signupDTO: SignUpDTO) {
     return this.authService.signup(
       signupDTO.username,
       signupDTO.email,
@@ -18,12 +18,12 @@ export class AuthController {
   }
 
   @Post('/signin')
-  signin(@Body() signinDTO: SignInDTO){
+  signin(@Body() signinDTO: SignInDTO) {
     return this.authService.signin(signinDTO.email, signinDTO.password);
   }
   @Post('/test')
   @UseGuards(AuthGuard())
-  test(@GetUser() user: User){
+  test(@GetUser() user: User) {
     return user;
   }
 }

@@ -15,4 +15,4 @@ import { Task } from 'src/tasks/task.entity';
   controllers: [UsersController],
   exports: [UsersService],
 })
-export class UsersModule {}
+export class UsersModule { }

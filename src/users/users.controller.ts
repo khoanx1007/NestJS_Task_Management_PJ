@@ -8,7 +8,7 @@ import { TasksService } from '../tasks/tasks.service';
 @Controller('users')
 export class UsersController {
   constructor(
-      private readonly usersService: UsersService) {}
+    private readonly usersService: UsersService) { }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
