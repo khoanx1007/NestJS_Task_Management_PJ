@@ -3,9 +3,7 @@ import { CreateTaskDTO, FilterTasksDTO, UpdateTaskDTO } from './task.dto';
 import { Task, TaskStatus } from './task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/users/user.entity';
-import { get } from 'http';
 
 @Injectable()
 export class TasksService {
@@ -15,11 +13,11 @@ export class TasksService {
   async getAllTasks(filterTasksDTO?: FilterTasksDTO): Promise<Task[]> {
     return this.taskRepository.findBy(filterTasksDTO);
   }
-  async getTaskById(id: number): Promise<Task>{
-    const task = await this.taskRepository.findOneBy({id: id});
+  async getTaskById(id: number, user: User): Promise<Task>{
+    const task = await this.taskRepository.findOneBy({id: id, user: user});
 
     if (!task){
-      throw new NotFoundException(`Task with id ${id} not found`);
+      throw new NotFoundException('Unavailabe Task');
     }
     return task;
   }
@@ -34,15 +32,18 @@ export class TasksService {
     return newTask
   }
 
-  async updateTask(id: number, updateTaskDTO: UpdateTaskDTO): Promise<Task>{
-    const task = this.getTaskById(id);
-    this.taskRepository.update({ id }, { ...updateTaskDTO });
-    return task;
+  async updateTask(id: number, updateTaskDTO: UpdateTaskDTO, user: User): Promise<Task>{
+    const task = await this.getTaskById(id, user);
+    const updatedTask = this.taskRepository.merge(
+      task,
+      updateTaskDTO,
+    );
+    return await this.taskRepository.save(updatedTask);
+;
   }
-  async deleteTaskById(id: number): Promise<void>{
-    const result = await this.taskRepository.delete(id);
-    if (result.affected === 0){
-      throw new NotFoundException(`Task with id ${id} not found`);
-    }
+  async deleteTaskById(id: number, user: User){
+    const task = await this.getTaskById(id, user);
+    this.taskRepository.remove(task);
+    return "Task Deleted Successfully";
   }
 }
