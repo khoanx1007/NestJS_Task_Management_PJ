@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDTO, FilterTasksDTO, UpdateTaskDTO } from './task.dto';
 import { Task, TaskStatus } from './task.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,34 +15,45 @@ export class TasksService {
   }
   async getTaskById(id: number, user: User): Promise<Task> {
     const task = await this.taskRepository.findOneBy({ id: id, user: user });
-
     if (!task) {
       throw new NotFoundException('Unavailabe Task');
     }
     return task;
   }
-  async getPersonalTasks(user: User): Promise<Task[]> {
-    const userTasks = await this.taskRepository.findBy({ user: user });
+  async getPersonalTasks(user: User, filterTasksDTO?: FilterTasksDTO): Promise<Task[]> {
+    const userTasks = await this.taskRepository.findBy({ user: user, ...filterTasksDTO });
     return userTasks;
   }
-  async createTask(createTaskDTO: CreateTaskDTO, user: User): Promise<Task> {
+  async createTask(createTaskDTO: CreateTaskDTO, user: User): Promise<any> {
     delete (user.password);
     const newTask = this.taskRepository.create({ ...createTaskDTO, status: TaskStatus.OPEN, user: user })
     await this.taskRepository.save(newTask);
-    return newTask
+    return {
+      message: 'task created successfully',
+      status: HttpStatus.CREATED,
+      data: newTask,
+    };
   }
 
-  async updateTask(id: number, updateTaskDTO: UpdateTaskDTO, user: User): Promise<Task> {
+  async updateTask(id: number, updateTaskDTO: UpdateTaskDTO, user: User): Promise<any> {
     const task = await this.getTaskById(id, user);
     const updatedTask = this.taskRepository.merge(
       task,
       updateTaskDTO,
     );
-    return await this.taskRepository.save(updatedTask);
+    await this.taskRepository.save(updatedTask)
+    return {
+      message: 'task update successfully',
+      status: HttpStatus.OK,
+      data: updatedTask,
+    };
   }
   async deleteTaskById(id: number, user: User) {
     const task = await this.getTaskById(id, user);
     this.taskRepository.remove(task);
-    return 'Task Deleted Successfully';
+    return {
+      message: 'task deleted successfully',
+      status: HttpStatus.OK,
+    };
   }
 }

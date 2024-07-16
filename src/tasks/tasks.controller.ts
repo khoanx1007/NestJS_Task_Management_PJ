@@ -2,16 +2,18 @@ import { Body, Controller, Delete, Get, Logger, Param, ParseIntPipe, Patch, Post
 import { TasksService } from './tasks.service';
 import { CreateTaskDTO, FilterTasksDTO, UpdateTaskDTO } from './task.dto';
 import { Task } from './task.entity';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/users/user.entity';
+import { JwtAuthGuard } from 'src/guard/jwt-auth.guard';
+import { SkipAuth } from 'src/guard/skip-auth.guard';
 
 @Controller('tasks')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class TasksController {
   private readonly logger = new Logger(TasksController.name)
   constructor(private readonly tasksService: TasksService) { }
 
+  @SkipAuth()
   @Get()
   getAllTasks(
     @Query(ValidationPipe) filterTasksDTO?: FilterTasksDTO,
@@ -19,9 +21,8 @@ export class TasksController {
     return this.tasksService.getAllTasks(filterTasksDTO);
   }
 
-  @Get('/personal-tasks')
+  @Get('/personal')
   getPersonalTasks(@GetUser() user: User): Promise<Task[]> {
-    this.logger.verbose(`User ${user.username} get personal tasks`)
     return this.tasksService.getPersonalTasks(user);
   }
 
@@ -30,7 +31,7 @@ export class TasksController {
     return this.tasksService.getTaskById(id, user);
   }
   @Post()
-  createTask(@Body() createTaskDTO: CreateTaskDTO, @GetUser() user: User): Promise<Task> {
+  createTask(@Body() createTaskDTO: CreateTaskDTO, @GetUser() user: User): Promise<any> {
     return this.tasksService.createTask(createTaskDTO, user);
   }
 
@@ -39,7 +40,7 @@ export class TasksController {
     @Param('id', ParseIntPipe) id: number,
     @Body(ValidationPipe) updateTaskDTO: UpdateTaskDTO,
     @GetUser() user: User
-  ) {
+  ): Promise<any> {
     return this.tasksService.updateTask(id, updateTaskDTO, user);
   }
 

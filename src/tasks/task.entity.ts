@@ -1,4 +1,3 @@
-import { IsIn, IsNotEmpty, IsOptional } from "class-validator";
 import { User } from "src/users/user.entity";
 import { BaseEntity, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 export enum TaskStatus {
