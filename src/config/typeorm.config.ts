@@ -1,8 +1,7 @@
-import { TypeOrmModuleOptions } from "@nestjs/typeorm";
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as config from 'config';
 
-const dbConfig = config.get('db')
-
+const dbConfig = config.get('db');
 export const typeOrmConfig: TypeOrmModuleOptions = {
   type: dbConfig.type,
   host: dbConfig.host,
@@ -11,5 +10,5 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
   password: dbConfig.password,
   database: dbConfig.database,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-  synchronize: true
-}
+  synchronize: true,
+};

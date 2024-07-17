@@ -7,8 +7,9 @@ import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {
-  }
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
@@ -25,16 +26,13 @@ export class UsersService {
   }
 
   async checkExistsUser(email: string, username: string) {
-    return this.userRepository.existsBy({ email }) || this.userRepository.existsBy({ username });
+    return (
+      this.userRepository.existsBy({ email }) ||
+      this.userRepository.existsBy({ username })
+    );
   }
+
   async findByEmail(email: string) {
     return this.userRepository.findOneBy({ email });
   }
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} user`;
-  // }
 }
