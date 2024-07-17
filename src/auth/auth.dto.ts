@@ -10,7 +10,7 @@ export class SignInDTO {
   password: string;
 }
 
-export class SignUpDTO  {
+export class SignUpDTO {
   @IsNotEmpty()
   @MaxLength(20)
   username: string;

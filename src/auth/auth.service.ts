@@ -9,24 +9,24 @@ export class AuthService {
   constructor(
     @Inject() private readonly usersService: UsersService,
     private jwtService: JwtService
-    ) {}
+  ) { }
 
-  async signup(username: string, email: string, password: string){
+  async signup(username: string, email: string, password: string) {
 
     if (await this.usersService.checkExistsUser(email, username)) {
       throw new ConflictException("username or email already exists");
     }
-    return this.usersService.create({username, email, password});
+    return this.usersService.create({ username, email, password });
   }
 
   async signin(email: string, password: string): Promise<{ accessToken: string }> {
     const user = await this.usersService.findByEmail(email);
     if (user && await bcrypt.compare(password, user.password)) {
-      const payload: JwtPayload = { email: user.email, id: user.id};
+      const payload: JwtPayload = { email: user.email, id: user.id };
       const accessToken = this.jwtService.sign(payload);
-      return {accessToken};
+      return { accessToken };
     }
-    else{
+    else {
       throw new UnauthorizedException('Invalid credentials');
     }
   }

@@ -6,15 +6,15 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({type: 'varchar', unique: true})
+  @Column({ type: 'varchar', unique: true })
   username: string;
 
-  @Column({type: 'varchar', unique: true})
+  @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @Column({type: 'varchar'})
+  @Column({ type: 'varchar' })
   password: string;
 
-  @OneToMany(type => Task, task => task.user, { eager: true, cascade: true} )
+  @OneToMany(type => Task, task => task.user, { eager: true, cascade: true })
   tasks: Task[];
 }
